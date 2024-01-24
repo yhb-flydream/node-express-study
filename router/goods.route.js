@@ -1,5 +1,23 @@
 const express = require('express')
 const router = express.Router()
+const fs = require('fs')
+const path = require('path')
+const multer = require('multer')
+
+const storage = multer.diskStorage({
+  // 目录
+  destination: (req, file, cb) => {
+    try {
+      fs.mkdirSync(path.join(process.cwd(), 'uploads'))
+    } catch (e) {}
+    cb(null, path.join(process.cwd(), 'uploads'))
+  },
+  // 文件名
+  filename: (req, file, cb) => {
+    cb(null, file.originalname)
+  },
+})
+const multerUpload = multer({ storage })
 
 const { auth, hadAdminPermission } = require('../middleware/auth.middleware')
 const { validator, validatorArr } = require('../middleware/goods.middleware')
@@ -11,7 +29,10 @@ const { upload, create, update, remove, restore, findAll } = require('../control
 // })
 
 // 上传图片
-router.post('/upload', hadAdminPermission, upload)
+// multerUpload.single 单文件上传
+// multerUpload.array 多文件上传
+router.post('/upload', hadAdminPermission, multerUpload.single('file'), upload)
+// router.post('/upload', hadAdminPermission, multerUpload.array('file'), upload)
 // 添加商品
 router.post('/create', hadAdminPermission, validatorArr(), create)
 // 修改商品

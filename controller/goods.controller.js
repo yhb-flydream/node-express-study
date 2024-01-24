@@ -5,13 +5,15 @@ const { createGoods, updateGoods, removeGoods, restoreGoods, findGoods } = requi
 
 class GoodsController {
   async upload(req, res) {
-    const { file } = req.files
+    // single -> req.file
+    // array -> req.files
+    const { file } = req
     if (file) {
       res.json({
         code: 0,
         msg: 'success',
         data: {
-          url: file.newFilename,
+          url: file.filename,
         },
       })
     } else {
